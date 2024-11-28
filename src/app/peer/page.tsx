@@ -39,6 +39,7 @@ const PeerPage = () => {
             host: `lingua-live-server-production.up.railway.app`,
             port: 9000,
             path: '/stream',
+            secure: true,
           });
 
           setPeerInstance(peer);
