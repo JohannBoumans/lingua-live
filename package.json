@@ -6,9 +6,9 @@
     "dev": "concurrently \"yarn dev:client\" \"yarn dev:server\"",
     "dev:client": "next dev --turbopack",
     "dev:server": "cd server && yarn dev",
-    "build": "concurrently \"yarn build:client\" \"yarn dev:server\"",
-    "build:client": "next build --turbopack",
-    "build:server": "cd server && next build",
+    "build": "concurrently \"yarn build:client\" \"yarn build:server\"",
+    "build:client": "next build",
+    "build:server": "cd server && yarn dev",
     "start": "next start",
     "lint": "next lint"
   },
