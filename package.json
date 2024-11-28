@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"yarn dev:client\" \"yarn dev:server\"",
+    "dev": "yarn dev:server && yarn build:client",
     "dev:client": "next dev --turbopack",
     "dev:server": "cd server && yarn dev",
-    "build": "concurrently \"yarn build:client\" \"yarn build:server\"",
+    "build": "yarn build:client && yarn build:server",
     "build:client": "next build",
     "build:server": "cd server && yarn dev",
     "start": "next start",
