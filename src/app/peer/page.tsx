@@ -36,7 +36,7 @@ const PeerPage = () => {
         let peer: Peer;
         if (typeof window !== 'undefined') {
           peer = new Peer(myUniqueId, {
-            host: 'localhost',
+            host: `https://lingua-live-server.vercel.app`,
             port: 9000,
             path: '/stream',
           });
