@@ -8,7 +8,7 @@
     "dev:server": "cd server && yarn dev",
     "build": "yarn build:client && yarn build:server",
     "build:client": "next build",
-    "build:server": "cd server && yarn dev",
+    "build:server": "cd server && yarn start",
     "start": "next start",
     "lint": "next lint"
   },
