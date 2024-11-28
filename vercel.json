@@ -1,7 +1,0 @@
-{
-  "buildCommand": "yarn build:server && yarn build:client",
-  "outputDirectory": "public",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
-  ]
-}
