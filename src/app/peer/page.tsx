@@ -39,7 +39,7 @@ const PeerPage = () => {
         let peer: Peer;
         if (typeof window !== 'undefined') {
             peer = new Peer(myUniqueId, {
-                host: `lingua-live-server-production.up.railway.app`,
+                host: `lingua-live-server-b1ec6cd6d3e5.herokuapp.com`,
                 // port: 8080,
                 path: '/stream',
                 secure: true,
