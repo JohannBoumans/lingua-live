@@ -20,10 +20,12 @@ const PeerPage = () => {
       video: true,
       audio: true,
     }).then(stream => {
-      const call = peerInstance?.call(idToCall, stream);
+        const call = peerInstance?.call(idToCall, stream);
+        console.log(call, idToCall, stream, 'HANDLE CALL')
       if (call) {
         call.on('stream', userVideoStream => {
           if (callingVideoRef.current) {
+            console.log(userVideoStream, 'USER VIDEO STREAM')
             callingVideoRef.current.srcObject = userVideoStream;
           }
         });
@@ -35,13 +37,14 @@ const PeerPage = () => {
     if(myUniqueId){
         let peer: Peer;
         if (typeof window !== 'undefined') {
-          peer = new Peer(myUniqueId, {
-            host: `lingua-live-server-production.up.railway.app`,
-            port: 9000,
-            path: '/stream',
-            secure: true,
-          });
-
+            peer = new Peer(myUniqueId, {
+                host: `lingua-live-server-production.up.railway.app`,
+                port: 8080,
+                path: '/stream',
+                secure: true,
+            });
+            
+            console.log(peer, 'ET QUOI???????')
           setPeerInstance(peer);
     
           navigator.mediaDevices.getUserMedia({
@@ -79,7 +82,7 @@ const PeerPage = () => {
       <p>your id : {myUniqueId}</p>
       <video className='w-72' playsInline ref={myVideoRef} autoPlay />
       <input className='text-black' placeholder="Id to call" value={idToCall} onChange={e => setIdToCall(e.target.value)} />
-      <button onClick={handleCall}>call</button>
+      <button onClick={handleCall}>Call</button>
       <video className='w-72' playsInline ref={callingVideoRef} autoPlay/>
     </div>
   );
