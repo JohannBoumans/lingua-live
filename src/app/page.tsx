@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from 'react';
-import Peer from 'peerjs';
+import Peer, { DataConnection } from 'peerjs';
  
 interface Captions {
   [key: string]: string;
@@ -17,77 +17,182 @@ const PeerPage = () => {
 
   const generateRandomString = () => Math.random().toString(36).substring(2);
 
-  const handleCall = () => {
-    navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    }).then(stream => {
-      const call = peerInstance?.call(idToCall, stream);
-      if (call) {
-        // Configurer le processeur audio pour la transcription
-        setupAudioProcessor(stream);
+//   const handleCall = () => {
+//     navigator.mediaDevices.getUserMedia({
+//       video: true,
+//       audio: true,
+//     }).then(stream => {
+//       const call = peerInstance?.call(idToCall, stream);
+//       if (call) {
+//         // Configurer le processeur audio pour la transcription
+//         setupAudioProcessor(stream);
         
-        call.on('stream', userVideoStream => {
-          if (callingVideoRef.current) {
-            callingVideoRef.current.srcObject = userVideoStream;
-          }
-        });
-      }
+//         call.on('stream', userVideoStream => {
+//           if (callingVideoRef.current) {
+//             callingVideoRef.current.srcObject = userVideoStream;
+//           }
+//         });
+//       }
+//     });
+//   };
+
+const handleCall = () => {
+  if (peerInstance) {
+    const conn = peerInstance.connect(idToCall);
+    conn.on('open', () => {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      }).then(stream => {
+        const call = peerInstance.call(idToCall, stream);
+        if (call) {
+          setupAudioProcessor(stream, conn); // Passer la connexion au processeur audio
+          call.on('stream', userVideoStream => {
+            if (callingVideoRef.current) {
+              callingVideoRef.current.srcObject = userVideoStream;
+            }
+          });
+        }
+      });
+    });
+  }
+};
+
+//   const setupAudioProcessor = (stream: MediaStream) => {
+//     const audioContext = new AudioContext();
+//     const source = audioContext.createMediaStreamSource(stream);
+//     const processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+//     source.connect(processor);
+//     processor.connect(audioContext.destination);
+
+//     processor.onaudioprocess = (e) => {
+//       const audioData = e.inputBuffer.getChannelData(0);
+//       // Envoyer les données audio via PeerJS
+//       peerInstance?.send({
+//         type: 'audioData',
+//         data: audioData
+//       });
+//     };
+//   };
+
+// Modifier setupAudioProcessor pour utiliser la connexion
+const setupAudioProcessor = (stream: MediaStream, conn: DataConnection) => {
+  const audioContext = new AudioContext();
+  const source = audioContext.createMediaStreamSource(stream);
+  const processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+  source.connect(processor);
+  processor.connect(audioContext.destination);
+
+  processor.onaudioprocess = (e) => {
+    const audioData = e.inputBuffer.getChannelData(0);
+    // Envoyer les données audio via la connexion DataConnection
+    conn.send({
+      type: 'audioData',
+      data: audioData
     });
   };
+};
 
-  const setupAudioProcessor = (stream: MediaStream) => {
-    const audioContext = new AudioContext();
-    const source = audioContext.createMediaStreamSource(stream);
-    const processor = audioContext.createScriptProcessor(4096, 1, 1);
+//   useEffect(() => {
+//     if(myUniqueId){
+//       let peer: Peer;
+//       if (typeof window !== 'undefined') {
+//         peer = new Peer(myUniqueId, {
+//           host: `lingua-live-server-b1ec6cd6d3e5.herokuapp.com`,
+//           path: '/stream',
+//           secure: true,
+//           debug: 3
+//         });
 
-    source.connect(processor);
-    processor.connect(audioContext.destination);
-
-    processor.onaudioprocess = (e) => {
-      const audioData = e.inputBuffer.getChannelData(0);
-      // Envoyer les données audio via PeerJS
-      peerInstance?.send({
-        type: 'audioData',
-        data: audioData
-      });
-    };
-  };
-
-  useEffect(() => {
-    if(myUniqueId){
-      let peer: Peer;
-      if (typeof window !== 'undefined') {
-        peer = new Peer(myUniqueId, {
-          host: `lingua-live-server-b1ec6cd6d3e5.herokuapp.com`,
-          path: '/stream',
-          secure: true,
-          debug: 3
-        });
-
-        setPeerInstance(peer);
+//         setPeerInstance(peer);
     
-        navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: true,
-        }).then(stream => {
-          if (myVideoRef.current) {
-            myVideoRef.current.srcObject = stream;
-          }
-          setupAudioProcessor(stream);
+//         navigator.mediaDevices.getUserMedia({
+//           video: true,
+//           audio: true,
+//         }).then(stream => {
+//           if (myVideoRef.current) {
+//             myVideoRef.current.srcObject = stream;
+//           }
+//           setupAudioProcessor(stream);
 
-          peer.on('call', call => {
-            call.answer(stream);
-            call.on('stream', userVideoStream => {
-              if (callingVideoRef.current) {
-                callingVideoRef.current.srcObject = userVideoStream;
-              }
-            });
+//           peer.on('call', call => {
+//             call.answer(stream);
+//             call.on('stream', userVideoStream => {
+//               if (callingVideoRef.current) {
+//                 callingVideoRef.current.srcObject = userVideoStream;
+//               }
+//             });
+//           });
+//         });
+
+//         // Écouter les messages de transcription
+//         // peer.on('data', (data: any) => {
+//         //   if (data.type === 'transcription') {
+//         //     setCaptions(prev => ({
+//         //       ...prev,
+//         //       [data.peerId]: data.transcription
+//         //     }));
+//         //   }
+//         // });
+//         peer.on('connection', (conn) => {
+//             conn.on('data', (data: any) => {
+//             if (data.type === 'transcription') {
+//                 setCaptions(prev => ({
+//                 ...prev,
+//                 [data.peerId]: data.transcription
+//                 }));
+//             }
+//             });
+//         });
+
+//       }
+//       return () => {
+//         if (peer) {
+//           peer.destroy();
+//         }
+//       };
+//     }
+//   }, [myUniqueId]);
+
+useEffect(() => {
+  if(myUniqueId){
+    let peer: Peer;
+    if (typeof window !== 'undefined') {
+      peer = new Peer(myUniqueId, {
+        host: `lingua-live-server-b1ec6cd6d3e5.herokuapp.com`,
+        path: '/stream',
+        secure: true,
+        debug: 3
+      });
+
+      setPeerInstance(peer);
+  
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      }).then(stream => {
+        if (myVideoRef.current) {
+          myVideoRef.current.srcObject = stream;
+        }
+
+        // Créer une connexion de données pour l'utilisateur actuel
+        const conn = peer.connect(myUniqueId);
+        setupAudioProcessor(stream, conn);
+
+        peer.on('call', call => {
+          call.answer(stream);
+          call.on('stream', userVideoStream => {
+            if (callingVideoRef.current) {
+              callingVideoRef.current.srcObject = userVideoStream;
+            }
           });
         });
+      });
 
-        // Écouter les messages de transcription
-        peer.on('data', (data: any) => {
+      peer.on('connection', (conn) => {
+        conn.on('data', (data: any) => {
           if (data.type === 'transcription') {
             setCaptions(prev => ({
               ...prev,
@@ -95,14 +200,15 @@ const PeerPage = () => {
             }));
           }
         });
-      }
-      return () => {
-        if (peer) {
-          peer.destroy();
-        }
-      };
+      });
     }
-  }, [myUniqueId]);
+    return () => {
+      if (peer) {
+        peer.destroy();
+      }
+    };
+  }
+}, [myUniqueId]);
 
   useEffect(() => {
     setMyUniqueId(generateRandomString);
