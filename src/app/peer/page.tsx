@@ -13,6 +13,7 @@ const PeerPage = () => {
 
   const generateRandomString = () => Math.random().toString(36).substring(2);
 
+  console.log(myVideoRef, callingVideoRef, 'CALL REF')
   // Here we declare a function to call the identifier and retrieve 
   // its video stream.
   const handleCall = () => {
