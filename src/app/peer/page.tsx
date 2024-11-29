@@ -40,9 +40,27 @@ const PeerPage = () => {
         if (typeof window !== 'undefined') {
             peer = new Peer(myUniqueId, {
                 host: `lingua-live-server-production.up.railway.app`,
-                port: 8080,
+                port: 443,
                 path: '/stream',
                 secure: true,
+                debug: 3
+            });
+
+            // Ajouter des gestionnaires d'événements pour le debugging
+            peer.on('open', (id) => {
+            console.log('Connection successful, ID:', id);
+            });
+
+            peer.on('error', (error) => {
+            console.error('PeerJS error:', error);
+            });
+
+            peer.on('disconnected', () => {
+            console.log('Disconnected from server');
+            });
+
+            peer.on('close', () => {
+            console.log('Connection closed');
             });
             
             console.log(peer, 'ET QUOI???????')
