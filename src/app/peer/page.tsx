@@ -40,7 +40,7 @@ const PeerPage = () => {
         if (typeof window !== 'undefined') {
             peer = new Peer(myUniqueId, {
                 host: `lingua-live-server-production.up.railway.app`,
-                port: 8080,
+                // port: 8080,
                 path: '/stream',
                 secure: true,
                 debug: 3
