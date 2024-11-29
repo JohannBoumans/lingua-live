@@ -21,7 +21,7 @@ const PeerPage = () => {
       audio: true,
     }).then(stream => {
         const call = peerInstance?.call(idToCall, stream);
-        console.log(call, idToCall, stream, 'HANDLE CALL')
+        console.log(call, `ID: ${idToCall}`, stream, 'HANDLE CALL')
       if (call) {
         call.on('stream', userVideoStream => {
           if (callingVideoRef.current) {
