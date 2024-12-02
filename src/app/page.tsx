@@ -89,6 +89,8 @@ const PeerPage = () => {
     setMyUniqueId(generateRandomString);
   }, []);
 
+  console.log(captions, 'CAPTIONS')
+
   return (
     <div className='flex flex-col justify-center items-center p-12'>
       <p>your id : {myUniqueId}</p>
