@@ -129,13 +129,13 @@ const PeerPage = () => {
 //   };
 
 useEffect(() => {
-    socketRef?.current?.on('userGreeting', data => {
+    socketRef?.current?.on('message', data => {
         console.log(data, 'CLIENT GREETING ?')
     })
 }, [])
 
   const handleHello = () => {
-        socketRef.current?.emit('userGreeting', { message: 'HELLO MY FRIEND' })
+        socketRef.current?.emit('message', { message: 'HELLO MY FRIEND' })
     }
 
   return (
