@@ -15,15 +15,20 @@ const PeerPage = () => {
   const [myUniqueId, setMyUniqueId] = useState<string>("");
   const [captions, setCaptions] = useState<Captions>({});
 
+  const generateRandomString = () => Math.random().toString(36).substring(2);
+
   useEffect(() => {
     // Configuration de Socket.IO
-    socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com');
+    if(myUniqueId){
+        // socketRef.current = io('http://localhost:8080');
+        socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com');
 
-    socketRef.current.on('connect', () => {
-      console.log('Connected to server');
-      setMyUniqueId(socketRef.current?.id || "");
-    });
+        socketRef.current.on('connect', () => {
+            console.log('Connected to server');
+            
+        })
 
+   }
     // Gestion de la signalisation WebRTC
     // socketRef.current.on('offer', async (offer) => {
     //   await handleOffer(offer);
@@ -128,6 +133,10 @@ const PeerPage = () => {
 //     }
 //   };
 
+  useEffect(() => {
+    setMyUniqueId(generateRandomString);
+  }, []);
+
 useEffect(() => {
     socketRef?.current?.on('message', data => {
         console.log(data, 'CLIENT GREETING ?')
@@ -137,7 +146,7 @@ useEffect(() => {
   const handleHello = () => {
     console.log('handle hello !')
         socketRef.current?.emit('message', { message: 'HELLO MY FRIEND' })
-    }
+ }
 
   return (
     <div className='flex flex-col justify-center items-center p-12'>
