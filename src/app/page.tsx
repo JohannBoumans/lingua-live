@@ -17,7 +17,7 @@ const PeerPage = () => {
 
   useEffect(() => {
     // Configuration de Socket.IO
-    socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com/stream`');
+    socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com`');
 
     socketRef.current.on('connect', () => {
       console.log('Connected to server');
@@ -135,6 +135,7 @@ useEffect(() => {
 }, [])
 
   const handleHello = () => {
+    console.log('handle hello !')
         socketRef.current?.emit('message', { message: 'HELLO MY FRIEND' })
     }
 
