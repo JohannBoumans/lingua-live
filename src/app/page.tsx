@@ -17,7 +17,7 @@ const PeerPage = () => {
 
   useEffect(() => {
     // Configuration de Socket.IO
-    socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com`');
+    socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com');
 
     socketRef.current.on('connect', () => {
       console.log('Connected to server');
