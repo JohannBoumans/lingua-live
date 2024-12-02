@@ -25,24 +25,24 @@ const PeerPage = () => {
     });
 
     // Gestion de la signalisation WebRTC
-    socketRef.current.on('offer', async (offer) => {
-      await handleOffer(offer);
-    });
+    // socketRef.current.on('offer', async (offer) => {
+    //   await handleOffer(offer);
+    // });
 
-    socketRef.current.on('answer', async (answer) => {
-      await peerConnectionRef.current?.setRemoteDescription(answer);
-    });
+    // socketRef.current.on('answer', async (answer) => {
+    //   await peerConnectionRef.current?.setRemoteDescription(answer);
+    // });
 
-    socketRef.current.on('ice-candidate', async (candidate) => {
-      await peerConnectionRef.current?.addIceCandidate(candidate);
-    });
+    // socketRef.current.on('ice-candidate', async (candidate) => {
+    //   await peerConnectionRef.current?.addIceCandidate(candidate);
+    // });
 
-    socketRef.current.on('transcription', (data) => {
-      setCaptions(prev => ({
-        ...prev,
-        [myUniqueId]: data.transcription
-      }));
-    });
+    // socketRef.current.on('transcription', (data) => {
+    //   setCaptions(prev => ({
+    //     ...prev,
+    //     [myUniqueId]: data.transcription
+    //   }));
+    // });
 
     return () => {
       peerConnectionRef.current?.close();
@@ -57,78 +57,84 @@ const PeerPage = () => {
       ]
     };
 
-    const peerConnection = new RTCPeerConnection(configuration);
+//     const peerConnection = new RTCPeerConnection(configuration);
     
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        socketRef.current?.emit('ice-candidate', event.candidate);
-      }
-    };
+//     peerConnection.onicecandidate = (event) => {
+//       if (event.candidate) {
+//         socketRef.current?.emit('ice-candidate', event.candidate);
+//       }
+//     };
 
-    peerConnection.ontrack = (event) => {
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0];
-      }
-    };
+//     peerConnection.ontrack = (event) => {
+//       if (remoteVideoRef.current) {
+//         remoteVideoRef.current.srcObject = event.streams[0];
+//       }
+//     };
 
-    peerConnectionRef.current = peerConnection;
-    return peerConnection;
-  };
+//     peerConnectionRef.current = peerConnection;
+//     return peerConnection;
+//   };
 
-  const handleOffer = async (offer: RTCSessionDescriptionInit) => {
-    const peerConnection = initializePeerConnection();
-    await peerConnection.setRemoteDescription(offer);
+//   const handleOffer = async (offer: RTCSessionDescriptionInit) => {
+//     const peerConnection = initializePeerConnection();
+//     await peerConnection.setRemoteDescription(offer);
     
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
+//     const answer = await peerConnection.createAnswer();
+//     await peerConnection.setLocalDescription(answer);
     
-    socketRef.current?.emit('answer', answer);
-  };
+//     socketRef.current?.emit('answer', answer);
+//   };
 
-  const handleCall = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+//   const handleCall = async () => {
+//     try {
+//       const stream = await navigator.mediaDevices.getUserMedia({
+//         video: true,
+//         audio: true,
+//       });
 
-      // Affichage de la vidéo locale
-      if (myVideoRef.current) {
-        myVideoRef.current.srcObject = stream;
-      }
+//       // Affichage de la vidéo locale
+//       if (myVideoRef.current) {
+//         myVideoRef.current.srcObject = stream;
+//       }
 
-      // Configuration WebRTC
-      const peerConnection = initializePeerConnection();
+//       // Configuration WebRTC
+//       const peerConnection = initializePeerConnection();
       
-      // Ajout des tracks au peer connection
-      stream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, stream);
-      });
+//       // Ajout des tracks au peer connection
+//       stream.getTracks().forEach(track => {
+//         peerConnection.addTrack(track, stream);
+//       });
 
-      // Création et envoi de l'offre
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      socketRef.current?.emit('offer', offer);
+//       // Création et envoi de l'offre
+//       const offer = await peerConnection.createOffer();
+//       await peerConnection.setLocalDescription(offer);
+//       socketRef.current?.emit('offer', offer);
 
-      // Configuration de l'audio pour la transcription
-      const audioContext = new AudioContext();
-      const source = audioContext.createMediaStreamSource(stream);
-      const processor = audioContext.createScriptProcessor(4096, 1, 1);
+//       // Configuration de l'audio pour la transcription
+//       const audioContext = new AudioContext();
+//       const source = audioContext.createMediaStreamSource(stream);
+//       const processor = audioContext.createScriptProcessor(4096, 1, 1);
 
-      source.connect(processor);
-      processor.connect(audioContext.destination);
+//       source.connect(processor);
+//       processor.connect(audioContext.destination);
 
-      processor.onaudioprocess = (e) => {
-        const audioData = e.inputBuffer.getChannelData(0);
-        socketRef.current?.emit('audioData', audioData);
-      };
-    } catch (error) {
-      console.error('Error accessing media devices:', error);
-    }
-  };
+//       processor.onaudioprocess = (e) => {
+//         const audioData = e.inputBuffer.getChannelData(0);
+//         socketRef.current?.emit('audioData', audioData);
+//       };
+//     } catch (error) {
+//       console.error('Error accessing media devices:', error);
+//     }
+//   };
+
+useEffect(() => {
+    socketRef?.current?.on('userGreeting', data => {
+        console.log(data, 'CLIENT GREETING ?')
+    })
+}, [])
 
   const handleHello = () => {
-        socketRef.current?.emit('greeting', { message: 'HELLO MY FRIEND' })
+        socketRef.current?.emit('userGreeting', { message: 'HELLO MY FRIEND' })
     }
 
   return (
@@ -140,12 +146,12 @@ const PeerPage = () => {
           {captions[myUniqueId]}
         </div>
       </div>
-      <button 
+      {/* <button 
         onClick={handleCall}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         Call
-      </button>
+      </button> */}
       <button 
         onClick={handleHello}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
