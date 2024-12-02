@@ -137,11 +137,9 @@ const PeerPage = () => {
     setMyUniqueId(generateRandomString);
   }, []);
 
-useEffect(() => {
-    socketRef?.current?.on('message', data => {
+socketRef?.current?.on('message', data => {
         console.log(data, 'CLIENT GREETING ?')
-    })
-}, [])
+})
 
   const handleHello = () => {
     console.log('handle hello !')
