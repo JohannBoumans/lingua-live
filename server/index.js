@@ -8,11 +8,10 @@ const speech = require('@google-cloud/speech');
 const app = express();
 const server = http.createServer(app);
 
-const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
-console.log(credentials, 'CREDENTIALS')
+// const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
 // Configuration Google Cloud Speech
 const speechClient = new speech.SpeechClient({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  keyFilename: 'config/google-credentials.json',
 //   credentials,
 });
 
@@ -34,7 +33,6 @@ const transcriptionStreams = new Map();
 // Gestion des événements PeerJS
 peerServer.on('connection', (client) => {
   console.log(`Client connected: ${client.getId()}`);
-  
   // Créer un nouveau stream de transcription pour ce client
   const recognizeStream = speechClient
     .streamingRecognize({
@@ -50,6 +48,8 @@ peerServer.on('connection', (client) => {
     })
     .on('data', (data) => {
       // Envoyer la transcription au client via un message de données PeerJS
+      console.log(data, 'DATA')
+      console.log(data.results[0].alternatives[0].transcript, 'RESULT')
       client.send({
         type: 'transcription',
         transcription: data.results[0].alternatives[0].transcript,
@@ -73,8 +73,10 @@ peerServer.on('disconnect', (client) => {
 
 // Gestion des messages audio pour la transcription
 peerServer.on('message', (client, message) => {
+    console.log(message.type, message, 'MESSAGE TYPE')
   if (message.type === 'audioData') {
     const recognizeStream = transcriptionStreams.get(client.getId());
+    console.log(recognizeStream, 'RECOGNIZE STREAM')
     if (recognizeStream) {
       recognizeStream.write(message.data);
     }
@@ -82,7 +84,7 @@ peerServer.on('message', (client, message) => {
 });
 
 app.use(cors({
-    origin: '*'
+    origin: '*',
 }));
 
 app.use("/stream", peerServer);
@@ -92,61 +94,6 @@ const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`PeerJS server running on port ${PORT}`);
 });
-
-
-
-
-
-
-
-
-
-
-// require("dotenv").config();
-
-// const { ExpressPeerServer } = require("peer");
-// const express = require("express");
-// const cors = require("cors");
-
-// const http = require("http");
-
-// const app = express();
-
-// const server = http.createServer(function (req, res) {
-//   res.writeHead(200, { "Content-Type": "text/plain" });
-//   res.end("Hello world!");
-// });
-
-// const PORT = process.env.PORT || 8080;
-
-// app.use(express.static("public"));
-
-// const peerServer = ExpressPeerServer(server, {
-//   debug: true,
-//   allow_discovery: true,
-// //   port: PORT,
-//   proxied: true,
-//   corsOptions: {
-//     origin: '*',
-//     methods: ['GET', 'POST'],
-//     credentials: true
-//   }
-// });
-
-// app.use(cors({
-//     origin: '*'
-// }))
-
-// app.use("/stream", peerServer);
-
-// server.listen(PORT, () => {
-//   console.log(`PeerJS server running on port ${PORT}`);
-// });
-
-
-
-
-
 
 
 

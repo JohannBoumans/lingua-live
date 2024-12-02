@@ -46,6 +46,7 @@ const PeerPage = () => {
 
         setPeerInstance(peer);
     
+        // connection.send('odfslk')
         navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true,
@@ -85,6 +86,21 @@ const PeerPage = () => {
     }
   }, [myUniqueId]);
 
+  const handleData = () => {
+    if (peerInstance) {
+        const conn = peerInstance.connect(idToCall);
+
+        conn.on('open', () => {
+            // Envoyer le message "HELLO" au serveur
+            conn.send({ type: 'greeting', message: 'HELLO' });
+        });
+
+        conn.on('data', (data) => {
+            console.log('Received data HELLO ??:', data);
+        });
+    }
+  }
+
   useEffect(() => {
     setMyUniqueId(generateRandomString);
   }, []);
@@ -108,7 +124,7 @@ const PeerPage = () => {
         onChange={e => setIdToCall(e.target.value)} 
       />
       <button onClick={handleCall}>Call</button>
-
+      <button onClick={handleData}>Says HELLO</button>
       <div className="relative">
         <video className='w-72' playsInline ref={callingVideoRef} autoPlay/>
         <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2">
