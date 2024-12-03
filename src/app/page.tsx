@@ -7,6 +7,9 @@ interface Captions {
   [key: string]: string;
 }
 
+// const socket = io('http://localhost:8080');
+const socket = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com');
+
 const PeerPage = () => {
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -21,12 +24,11 @@ const PeerPage = () => {
     // Configuration de Socket.IO
     if(myUniqueId){
         // socketRef.current = io('http://localhost:8080');
-        socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com');
+        // // socketRef.current = io('lingua-live-server-b1ec6cd6d3e5.herokuapp.com');
 
-        socketRef.current.on('connect', () => {
-            console.log('Connected to server');
-            
-        })
+        // socketRef.current?.on('connect', () => {
+        //     console.log('Connected to server');
+        // })
 
    }
     // Gestion de la signalisation WebRTC
@@ -137,13 +139,28 @@ const PeerPage = () => {
     setMyUniqueId(generateRandomString);
   }, []);
 
-socketRef?.current?.on('message', data => {
-        console.log(data, 'CLIENT GREETING ?')
-})
+  useEffect(() => {
+    // const socket = io("http://localhost:8080");
+    socket.on("messageFromServer", (message) => {
+      console.log(message, 'MESSAGE')
+    });
+    // Cleanup function to remove the event listener
+    return () => {
+      socket.off("messageFromServer ");
+      socket.disconnect();
+    };
+  }, []);
+
+// useEffect(() => {
+//     socketRef.current?.on('messageFromServer', data => {
+//         console.log(data, 'CLIENT GREETING use effect?')
+//     })
+// }, [socketRef.current, socketRef])
 
   const handleHello = () => {
     console.log('handle hello !')
-        socketRef.current?.emit('message', { message: 'HELLO MY FRIEND' })
+    // const socket = io("http://localhost:8080");
+    socket.emit('message', { message: 'HELLO MY FRIEND AGAIN' })
  }
 
   return (
